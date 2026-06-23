@@ -6,20 +6,34 @@ function App() {
   const [nextCursor, setNextCursor] = useState(null);
 
   const fetchProducts = async () => {
+    const params = new URLSearchParams(window.location.search);
+
+    const category = params.get("category");
+
     let url = "https://assignment-95xc.vercel.app/products";
 
-    if (nextCursor) {
-      url += `?cursorUpdatedAt=${encodeURIComponent(
-        nextCursor.updated_at
-      )}`;
+    const queryParams = [];
 
-      url += `&cursorId=${nextCursor.id}`;
+    if (category) {
+      queryParams.push(`category=${encodeURIComponent(category)}`);
     }
-    
-    console.log("URL:", url);
+
+    if (nextCursor) {
+      queryParams.push(
+        `cursorUpdatedAt=${encodeURIComponent(nextCursor.updated_at)}`
+      );
+      queryParams.push(`cursorId=${nextCursor.id}`);
+    }
+
+    if (queryParams.length > 0) {
+      url += `?${queryParams.join("&")}`;
+    }
+
+    console.log(url);
+
     const res = await axios.get(url);
 
-    setProducts(prev => [...prev, ...res.data.data]);
+    setProducts((prev) => [...prev, ...res.data.data]);
     setNextCursor(res.data.nextCursor);
   };
 
@@ -31,7 +45,7 @@ function App() {
     <div>
       <h1>Products</h1>
 
-      {products.map(product => (
+      {products.map((product) => (
         <div key={product.id}>
           <h3>{product.name}</h3>
           <p>{product.category}</p>
@@ -40,9 +54,7 @@ function App() {
         </div>
       ))}
 
-      <button onClick={fetchProducts}>
-        Load More
-      </button>
+      <button onClick={fetchProducts}>Load More</button>
     </div>
   );
 }
