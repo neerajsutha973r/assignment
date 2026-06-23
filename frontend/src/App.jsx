@@ -6,7 +6,7 @@ function App() {
   const [nextCursor, setNextCursor] = useState(null);
 
   const fetchProducts = async () => {
-    let url = "http://localhost:3000/products";
+    let url = "https://assignment-95xc.vercel.app/products";
 
     if (nextCursor) {
       url += `?cursorUpdatedAt=${encodeURIComponent(
