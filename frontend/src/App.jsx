@@ -81,7 +81,7 @@ function App() {
             setCategory(e.target.checked ? "Clothing" : "")
           }
         />
-        Books
+        Clothing
       </label>
       <br />
        <label>
@@ -92,7 +92,7 @@ function App() {
             setCategory(e.target.checked ? "Sports" : "")
           }
         />
-        Books
+        Sports
       </label>
       <br></br>
        <label>
@@ -103,7 +103,7 @@ function App() {
             setCategory(e.target.checked ? "Home" : "")
           }
         />
-        Books
+        Home
       </label>
       <br></br>
 
