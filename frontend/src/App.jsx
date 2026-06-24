@@ -7,6 +7,16 @@ function App() {
   const [category, setCategory] = useState("");
   const [cursorUpdatedAt, setCursorUpdatedAt] = useState("");
   const [cursorId, setCursorId] = useState("");
+  const [showLoadMore, setShowLoadMore] = useState(false);
+
+  const handleSearch = async () => {
+  setProducts([]);
+  setNextCursor(null);
+
+  await fetchProducts();
+
+  setShowLoadMore(true);
+};
 
   const fetchProducts = async () => {
     let url = "https://assignment-95xc.vercel.app/products";//
@@ -127,7 +137,7 @@ function App() {
       <br />
       <br />
 
-      <button onClick={fetchProducts}>Search</button>
+      <button onClick={handleSearch}>Search</button>
 
       <hr />
 
@@ -139,6 +149,11 @@ function App() {
           <hr />
         </div>
       ))}
+    {showLoadMore && nextCursor && (
+  <button onClick={fetchProducts}>
+    Load More
+  </button>
+)}
     </div>
   );
 }
