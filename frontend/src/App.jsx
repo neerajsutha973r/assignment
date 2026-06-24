@@ -3,60 +3,62 @@ import axios from "axios";
 
 function App() {
   const [products, setProducts] = useState([]);
-
   const [category, setCategory] = useState("");
-  const [cursorUpdatedAt, setCursorUpdatedAt] = useState("");
-  const [cursorId, setCursorId] = useState("");
-  const [showLoadMore, setShowLoadMore] = useState(false);
+  const [nextCursor, setNextCursor] = useState(null);
 
-  const handleSearch = async () => {
-  setProducts([]);
-  setNextCursor(null);
+  const fetchProducts = async (reset = false) => {
+    try {
+      let url = "https://assignment-95xc.vercel.app/products";
 
-  await fetchProducts();
+      const queryParams = [];
 
-  setShowLoadMore(true);
-};
+      if (category) {
+        queryParams.push(`category=${encodeURIComponent(category)}`);
+      }
 
-  const fetchProducts = async () => {
-    let url = "https://assignment-95xc.vercel.app/products";//
+      if (!reset && nextCursor) {
+        queryParams.push(
+          `cursorUpdatedAt=${encodeURIComponent(
+            nextCursor.updated_at
+          )}`
+        );
+        queryParams.push(`cursorId=${nextCursor.id}`);
+      }
 
-    const queryParams = [];
+      if (queryParams.length > 0) {
+        url += `?${queryParams.join("&")}`;
+      }
 
-    if (category) {
-      queryParams.push(`category=${encodeURIComponent(category)}`);
+      console.log(url);
+
+      const res = await axios.get(url);
+
+      if (reset) {
+        setProducts(res.data.data);
+      } else {
+        setProducts((prev) => [...prev, ...res.data.data]);
+      }
+
+      setNextCursor(res.data.nextCursor);
+    } catch (err) {
+      console.error(err);
     }
-
-    if (cursorUpdatedAt) {
-      queryParams.push(
-        `cursorUpdatedAt=${encodeURIComponent(cursorUpdatedAt)}`
-      );
-    }
-
-    if (cursorId) {
-      queryParams.push(`cursorId=${cursorId}`);
-    }
-
-    if (queryParams.length > 0) {
-      url += `?${queryParams.join("&")}`;
-    }
-
-    console.log(url);
-
-    const res = await axios.get(url);
-
-    setProducts(res.data.data);
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchProducts(true);
   }, []);
+
+  const handleSearch = () => {
+    setNextCursor(null);
+    fetchProducts(true);
+  };
 
   return (
     <div style={{ padding: "20px" }}>
       <h1>Products</h1>
 
-      <h3>Category</h3>
+      <h3>Category Filter</h3>
 
       <label>
         <input
@@ -83,7 +85,8 @@ function App() {
       </label>
 
       <br />
-       <label>
+
+      <label>
         <input
           type="checkbox"
           checked={category === "Clothing"}
@@ -93,8 +96,10 @@ function App() {
         />
         Clothing
       </label>
+
       <br />
-       <label>
+
+      <label>
         <input
           type="checkbox"
           checked={category === "Sports"}
@@ -104,8 +109,10 @@ function App() {
         />
         Sports
       </label>
-      <br></br>
-       <label>
+
+      <br />
+
+      <label>
         <input
           type="checkbox"
           checked={category === "Home"}
@@ -115,24 +122,6 @@ function App() {
         />
         Home
       </label>
-      <br></br>
-
-      <input
-        type="text"
-        placeholder="cursorUpdatedAt"
-        value={cursorUpdatedAt}
-        onChange={(e) => setCursorUpdatedAt(e.target.value)}
-      />
-
-      <br />
-      <br />
-
-      <input
-        type="number"
-        placeholder="cursorId"
-        value={cursorId}
-        onChange={(e) => setCursorId(e.target.value)}
-      />
 
       <br />
       <br />
@@ -144,16 +133,17 @@ function App() {
       {products.map((product) => (
         <div key={product.id}>
           <h3>{product.name}</h3>
-          <p>{product.category}</p>
-          <p>₹{product.price}</p>
+          <p>Category: {product.category}</p>
+          <p>Price: ₹{product.price}</p>
           <hr />
         </div>
       ))}
-    {showLoadMore && nextCursor && (
-  <button onClick={fetchProducts}>
-    Load More
-  </button>
-)}
+
+      {nextCursor && (
+        <button onClick={() => fetchProducts(false)}>
+          Load More
+        </button>
+      )}
     </div>
   );
 }
