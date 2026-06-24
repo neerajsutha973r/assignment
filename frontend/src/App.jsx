@@ -10,7 +10,7 @@ function App() {
 
   const fetchProducts = async (reset = false) => {
     try {
-      let url = "https://assignment-95xc.vercel.app";
+      let url = "https://assignment-95xc.vercel.app/products";
 
       const queryParams = [];
 
