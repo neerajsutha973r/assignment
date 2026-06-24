@@ -9,7 +9,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://neerajsutha973r-assignment.vercel.app", //
+    origin: "http://localhost:5173", //https://neerajsutha973r-assignment.vercel.app
   })
 );
 

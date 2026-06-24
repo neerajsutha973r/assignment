@@ -4,24 +4,41 @@ import axios from "axios";
 function App() {
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState("");
+  const [cursorUpdatedAt, setCursorUpdatedAt] = useState("");
+  const [cursorId, setCursorId] = useState("");
   const [nextCursor, setNextCursor] = useState(null);
 
   const fetchProducts = async (reset = false) => {
     try {
-      let url = "https://assignment-95xc.vercel.app/products";
+      let url = "http://localhost:3000/products";
 
       const queryParams = [];
 
       if (category) {
-        queryParams.push(`category=${encodeURIComponent(category)}`);
+        queryParams.push(
+          `category=${encodeURIComponent(category)}`
+        );
       }
 
-      if (!reset && nextCursor) {
+      if (reset) {
+        if (cursorUpdatedAt) {
+          queryParams.push(
+            `cursorUpdatedAt=${encodeURIComponent(
+              cursorUpdatedAt
+            )}`
+          );
+        }
+
+        if (cursorId) {
+          queryParams.push(`cursorId=${cursorId}`);
+        }
+      } else if (nextCursor) {
         queryParams.push(
           `cursorUpdatedAt=${encodeURIComponent(
             nextCursor.updated_at
           )}`
         );
+
         queryParams.push(`cursorId=${nextCursor.id}`);
       }
 
@@ -50,7 +67,6 @@ function App() {
   }, []);
 
   const handleSearch = () => {
-    setNextCursor(null);
     fetchProducts(true);
   };
 
@@ -78,7 +94,9 @@ function App() {
           type="checkbox"
           checked={category === "Electronics"}
           onChange={(e) =>
-            setCategory(e.target.checked ? "Electronics" : "")
+            setCategory(
+              e.target.checked ? "Electronics" : ""
+            )
           }
         />
         Electronics
@@ -126,18 +144,47 @@ function App() {
       <br />
       <br />
 
-      <button onClick={handleSearch}>Search</button>
+      <input
+        type="text"
+        placeholder="cursorUpdatedAt"
+        value={cursorUpdatedAt}
+        onChange={(e) =>
+          setCursorUpdatedAt(e.target.value)
+        }
+      />
+
+      <br />
+      <br />
+
+      <input
+        type="number"
+        placeholder="cursorId"
+        value={cursorId}
+        onChange={(e) => setCursorId(e.target.value)}
+      />
+
+      <br />
+      <br />
+
+      <button onClick={handleSearch}>
+        Search
+      </button>
 
       <hr />
 
       {products.map((product) => (
-        <div key={product.id}>
-          <h3>{product.name}</h3>
-          <p>Category: {product.category}</p>
-          <p>Price: ₹{product.price}</p>
-          <hr />
-        </div>
-      ))}
+  <div key={product.id}>
+    <h3>{product.name}</h3>
+
+    <p>Category: {product.category}</p>
+    <p>Price: ₹{product.price}</p>
+
+    <p>Created At: {product.created_at}</p>
+    <p>Updated At: {product.updated_at}</p>
+
+    <hr />
+  </div>
+))}
 
       {nextCursor && (
         <button onClick={() => fetchProducts(false)}>
