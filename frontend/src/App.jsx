@@ -3,14 +3,13 @@ import axios from "axios";
 
 function App() {
   const [products, setProducts] = useState([]);
-  const [nextCursor, setNextCursor] = useState(null);
+
+  const [category, setCategory] = useState("");
+  const [cursorUpdatedAt, setCursorUpdatedAt] = useState("");
+  const [cursorId, setCursorId] = useState("");
 
   const fetchProducts = async () => {
-    const params = new URLSearchParams(window.location.search);
-
-    const category = params.get("category");
-
-    let url = "https://assignment-95xc.vercel.app/products";
+    let url = "https://assignment-95xc.vercel.app/products";//
 
     const queryParams = [];
 
@@ -18,11 +17,14 @@ function App() {
       queryParams.push(`category=${encodeURIComponent(category)}`);
     }
 
-    if (nextCursor) {
+    if (cursorUpdatedAt) {
       queryParams.push(
-        `cursorUpdatedAt=${encodeURIComponent(nextCursor.updated_at)}`
+        `cursorUpdatedAt=${encodeURIComponent(cursorUpdatedAt)}`
       );
-      queryParams.push(`cursorId=${nextCursor.id}`);
+    }
+
+    if (cursorId) {
+      queryParams.push(`cursorId=${cursorId}`);
     }
 
     if (queryParams.length > 0) {
@@ -33,8 +35,7 @@ function App() {
 
     const res = await axios.get(url);
 
-    setProducts((prev) => [...prev, ...res.data.data]);
-    setNextCursor(res.data.nextCursor);
+    setProducts(res.data.data);
   };
 
   useEffect(() => {
@@ -42,8 +43,93 @@ function App() {
   }, []);
 
   return (
-    <div>
+    <div style={{ padding: "20px" }}>
       <h1>Products</h1>
+
+      <h3>Category</h3>
+
+      <label>
+        <input
+          type="checkbox"
+          checked={category === "Books"}
+          onChange={(e) =>
+            setCategory(e.target.checked ? "Books" : "")
+          }
+        />
+        Books
+      </label>
+
+      <br />
+
+      <label>
+        <input
+          type="checkbox"
+          checked={category === "Electronics"}
+          onChange={(e) =>
+            setCategory(e.target.checked ? "Electronics" : "")
+          }
+        />
+        Electronics
+      </label>
+
+      <br />
+       <label>
+        <input
+          type="checkbox"
+          checked={category === "Clothing"}
+          onChange={(e) =>
+            setCategory(e.target.checked ? "Clothing" : "")
+          }
+        />
+        Books
+      </label>
+      <br />
+       <label>
+        <input
+          type="checkbox"
+          checked={category === "Sports"}
+          onChange={(e) =>
+            setCategory(e.target.checked ? "Sports" : "")
+          }
+        />
+        Books
+      </label>
+      <br></br>
+       <label>
+        <input
+          type="checkbox"
+          checked={category === "Home"}
+          onChange={(e) =>
+            setCategory(e.target.checked ? "Home" : "")
+          }
+        />
+        Books
+      </label>
+      <br></br>
+
+      <input
+        type="text"
+        placeholder="cursorUpdatedAt"
+        value={cursorUpdatedAt}
+        onChange={(e) => setCursorUpdatedAt(e.target.value)}
+      />
+
+      <br />
+      <br />
+
+      <input
+        type="number"
+        placeholder="cursorId"
+        value={cursorId}
+        onChange={(e) => setCursorId(e.target.value)}
+      />
+
+      <br />
+      <br />
+
+      <button onClick={fetchProducts}>Search</button>
+
+      <hr />
 
       {products.map((product) => (
         <div key={product.id}>
@@ -53,8 +139,6 @@ function App() {
           <hr />
         </div>
       ))}
-
-      <button onClick={fetchProducts}>Load More</button>
     </div>
   );
 }
